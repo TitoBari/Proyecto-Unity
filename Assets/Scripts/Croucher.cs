@@ -2,27 +2,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CollisionDetection))]
+
 public class Croucher : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private GameObject ColliderStanding;
 
-    // Update is called once per frame
-    void Update()
+    [SerializeField]
+    private GameObject colliderCcrouching;
+
+    private CollisionDetection _collisionDetection;
+    private bool _wantsToStandUp;
+
+    public bool IsCrouching;
+
+    void FixedUpdate()
     {
-        
+        if (_wantsToStandUp && CanStandUp()) StandUp();
     }
 
     public void OnCrouchStart()
     {
-        Debug.Log("start crouch");
+        ColliderStanding.SetActive(false);
+        colliderCcrouching.SetActive(true);
+
+        _wantsToStandUp = false;
+        IsCrouching = true;
     }
 
     public void OnCrouchEnd()
     {
-        Debug.Log("end crouch");
+        _wantsToStandUp = true;
+    }
+
+    private void StandUp()
+    {
+        ColliderStanding.SetActive(true);
+        colliderCcrouching.SetActive(false);
+
+        _wantsToStandUp = false;
+        IsCrouching = false;
+    }
+
+    private bool CanStandUp()
+    {
+        if (!_collisionDetection) _collisionDetection = GetComponent<CollisionDetection>();
+
+        return !_collisionDetection.IsTouchingUp;
     }
 }
